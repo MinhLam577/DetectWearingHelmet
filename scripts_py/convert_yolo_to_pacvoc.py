@@ -1,33 +1,43 @@
 import xml.etree.cElementTree as ET
 import cv2
 import os
+import re
 
-img_dir = r"D:\biensoxe.v1i.yolov7pytorch\collect\images"
-annotation_dir = r"D:\biensoxe.v1i.yolov7pytorch\collect\labels"
-save_dir = r"D:\biensoxe.v1i.yolov7pytorch\collect\labels_voc"
+img_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_2\helm\helm\images\valid"
+annotation_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_2\helm\helm\labels\valid"
+save_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_2\helm\helm\labels\valid_voc"
+label_path = r'D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\annotations\label_map.pbtxt'
+
 # Read image
 def ReadImage(filename):
     img = cv2.imread(filename)
     return img
 
+#Read label
+def ReadLabel(label_path):
+    with open(label_path, 'r') as file:
+        data = file.read()
+        pattern = r"item\s*{\s*name:'(.*?)'\s*id:(\d+)\s*}"
+        result = re.findall(pattern, data, re.MULTILINE)
+        return [{"name": name, "id": int(id) - 1} for name, id in result]
+
 def ReadAnnotation(filename):
+    annotation = []
     with open(filename, 'r') as f:
-        data = f.readline().split()
-        data = [float(i) for i in data]
-    return data
+        lines = f.readlines()
+        for line in lines:
+            data = line.strip().split()
+            data = [float(i) for i in data]
+            annotation.append(data)
+    return annotation
 
-
-def convert_yolo_to_xml(yolo_data_path, img_path):
-    yolo_data = ReadAnnotation(yolo_data_path)
+def convert_yolo_to_xml(yolo_data_path, img_path, label_path):
+    label_data = ReadLabel(label_path)
+    yolo_data_arr = ReadAnnotation(yolo_data_path)
     img = ReadImage(img_path)
     img_height,img_width, _ = img.shape
     img_name = img_path.split('\\')[-1]
-    # Convert YOLO center coordinates (normalized) to XML format
-    xmin = (yolo_data[1] - yolo_data[3]/2.) * img_width
-    xmax = (yolo_data[1] + yolo_data[3]/2.) * img_width
-    ymin = (yolo_data[2] - yolo_data[4]/2.) * img_height
-    ymax = (yolo_data[2] + yolo_data[4]/2.) * img_height
-
+    
     # Create XML tree structure
     annotation = ET.Element("annotation")
     ET.SubElement(annotation, "folder").text = "images"
@@ -37,17 +47,27 @@ def convert_yolo_to_xml(yolo_data_path, img_path):
     ET.SubElement(size, "height").text = str(img_height)
     ET.SubElement(size, "depth").text = "3"
     ET.SubElement(annotation, "segmented").text = "0"
-    obj = ET.SubElement(annotation, "object")
-    ET.SubElement(obj, "name").text = "licence"
-    ET.SubElement(obj, "pose").text = "Unspecified"
-    ET.SubElement(obj, "truncated").text = "0"
-    ET.SubElement(obj, "occluded").text = "0"
-    ET.SubElement(obj, "difficult").text = "0"
-    bndbox = ET.SubElement(obj, "bndbox")
-    ET.SubElement(bndbox, "xmin").text = str(int(xmin))
-    ET.SubElement(bndbox, "ymin").text = str(int(ymin))
-    ET.SubElement(bndbox, "xmax").text = str(int(xmax))
-    ET.SubElement(bndbox, "ymax").text = str(int(ymax))
+    for i in range(len(yolo_data_arr)):
+        yolo_data = yolo_data_arr[i]
+        id = int(yolo_data[0])
+        # Convert YOLO center coordinates (normalized) to XML format
+        xmin = (yolo_data[1] - yolo_data[3]/2.) * img_width
+        xmax = (yolo_data[1] + yolo_data[3]/2.) * img_width
+        ymin = (yolo_data[2] - yolo_data[4]/2.) * img_height
+        ymax = (yolo_data[2] + yolo_data[4]/2.) * img_height
+        
+        # Create XML tree structure
+        obj = ET.SubElement(annotation, "object")
+        ET.SubElement(obj, "name").text = label_data[id].get('name')
+        ET.SubElement(obj, "pose").text = "Unspecified"
+        ET.SubElement(obj, "truncated").text = "0"
+        ET.SubElement(obj, "occluded").text = "0"
+        ET.SubElement(obj, "difficult").text = "0"
+        bndbox = ET.SubElement(obj, "bndbox")
+        ET.SubElement(bndbox, "xmin").text = str(int(xmin))
+        ET.SubElement(bndbox, "ymin").text = str(int(ymin))
+        ET.SubElement(bndbox, "xmax").text = str(int(xmax))
+        ET.SubElement(bndbox, "ymax").text = str(int(ymax))
 
     # Convert to string
     xml_str = ET.tostring(annotation)
@@ -67,6 +87,4 @@ list_annotation = [os.path.join(annotation_dir, i) for i in list_annotation]
 for idx, (img_path, annotation_path) in enumerate(zip(list_img, list_annotation), 1):
     percentage = idx / len(list_img) * 100
     print(f"Processing: {idx}/{len(list_img)} - {percentage:.2f}%")
-    # os.rename(img_path, os.path.join(img_dir, f"{idx}.jpg"))
-    # os.rename(annotation_path, os.path.join(annotation_dir, f"{idx}.txt"))
-    convert_yolo_to_xml(annotation_path, img_path)
+    convert_yolo_to_xml(annotation_path, img_path, label_path)
