@@ -17,9 +17,9 @@ from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as viz_utils
 from object_detection.core import data_parser
 from object_detection.core import standard_fields as fields
-
+import matplotlib.pyplot as plt
 from object_detection.metrics.tf_example_parser import BoundingBoxParser, StringParser, Int64Parser, FloatParser
-
+import seaborn as sns
 tf.compat.v1.flags.DEFINE_string('input_tfrecord_path', None,
                                  'Input tf record path')
 tf.compat.v1.flags.DEFINE_string('output_path', None,
@@ -175,7 +175,8 @@ def process_detections(input_tfrecord_path, model, categories, draw_option, draw
             bar.update(image_index)
 
     print(f'Processed {image_index + 1} images')
-
+    # Lưu ma trận vào file với định dạng là số nguyên
+    np.savetxt("confusion_matrix.csv", confusion_matrix, fmt='%i', delimiter=",")
     return confusion_matrix
     
 def display(confusion_matrix, categories, output_path):
@@ -186,8 +187,6 @@ def display(confusion_matrix, categories, output_path):
       categories: ordered array of class IDs
       output_path: where to save CSV
     '''
-    print('\nConfusion Matrix:')
-    print(confusion_matrix, '\n')
     results = []
 
     for i in range(len(categories)):
@@ -203,7 +202,38 @@ def display(confusion_matrix, categories, output_path):
         results.append({'category' : name, f'precision_@{IOU_THRESHOLD}IOU' : precision, f'recall_@{IOU_THRESHOLD}IOU' : recall})
     
     df = pd.DataFrame(results)
-    print(df)
+    accuracies = np.diag(confusion_matrix) / np.sum(confusion_matrix, axis=1)
+
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    # Tính toán F1 Score
+    df['f1_score_@0.5IOU'] = 2 * (df['precision_@0.5IOU'] * df['recall_@0.5IOU']) / (df['precision_@0.5IOU'] + df['recall_@0.5IOU'])
+    # Vẽ biểu đồ
+    ax1.set_title('Biểu đồ Precision, Recall, F1 Score @0.5IOU')
+    ax1 = df.plot(y=['precision_@0.5IOU', 'recall_@0.5IOU', 'f1_score_@0.5IOU'], kind='bar', figsize=(10,7),
+                  ax=ax1, label=['precision_@0.5IOU', 'recall_@0.5IOU', 'f1_score_@0.5IOU'], width=0.7)
+    # Xoay nhãn về thẳng
+    ax1.set_xticklabels(df['category'], rotation=0)
+    ax1.set_ylabel('Giá trị', rotation=0, labelpad=30)
+    # Hiện giá trị các nhãn trên cột và canh giữa
+    for p in ax1.patches:
+        width = p.get_width()
+        height = p.get_height()
+        x, y = p.get_xy() 
+        ax1.annotate(f'{height:.2f}', (x + width/2, y + height*1.02), ha='center')
+    ax1.legend(loc='lower right')
+    # Calculate accuracy
+    accuracy = np.trace(confusion_matrix) / np.sum(confusion_matrix)
+    ax2.set_title('Model Accuracy')
+    # Plot 'total_accuracy'
+    ax2.bar('accuracy', accuracy, color='blue', label='accuracy', width=0.7)
+    ax2.set_xlim([-1, 1]) 
+    for p in ax2.patches:
+        width = p.get_width()
+        height = p.get_height()
+        x, y = p.get_xy() 
+        ax2.annotate(f'{height:.2f}', (x + width/2, y + height*1.02), ha='center')
+    ax2.legend(loc='lower right')
+    plt.savefig('Precision_Recall_f1_score_Accuracy.png')
     df.to_csv(output_path)
 
 def draw(image_name, image_path, image, categories, groundtruth_boxes, groundtruth_classes, detection_boxes, detection_classes, detection_scores):
@@ -265,6 +295,22 @@ def draw(image_name, image_path, image, categories, groundtruth_boxes, groundtru
 
     cv2.imwrite(os.path.join(image_path, image_name), image_viz)
 
+def plot_confusion_matrix(cm, classes, cmap=plt.cm.Blues):
+    # Vẽ ma trận nhầm lẫn
+    plt.figure(figsize=(10,7))
+    ax = sns.heatmap(cm, annot=True, fmt=".0f", linewidths=.5, square = True, cmap = cmap)
+    ax.set_xticklabels(classes, rotation=0, va='top', position=(0,1.04))
+    ax.tick_params(axis='x', labeltop=True, top=True, labelbottom=False, bottom=False)
+    ax.set_yticklabels(classes, rotation=0, va='top')
+    ax.tick_params(axis='y', labeltop=True, top=True, labelbottom=False, bottom=False)
+
+    ax.yaxis.set_label_position("left") # Di chuyển nhãn y sang trái
+    #Xoay nhãn y 90 độ
+    ax.set_ylabel('Nhãn thực tế', rotation=0, labelpad=30)
+    ax.set_xlabel('Nhãn dự đoán', rotation=0, labelpad=30)
+    ax.set_title('Ma trận nhầm lẫn', size = 15, pad=20)
+    plt.savefig('confusion_matrix.png')
+
 def main(_):
     required_flags = ['input_tfrecord_path', 'output_path',
                       'inference_graph', 'class_labels']
@@ -293,11 +339,12 @@ def main(_):
     # Run inference and compute confusion matrix
     print('Evaluating model...')
     confusion_matrix = process_detections(input_tfrecord_path, model, categories, draw_option, draw_save_path)
-
+    classes = [category['name'] for category in categories] + ['No detection']
+    
     # Save to CSV
     print('Saving confusion matrix...')
     display(confusion_matrix, categories, FLAGS.output_path)
-
+    plot_confusion_matrix(confusion_matrix, classes)
     print('Done!')  
 
 if __name__ == '__main__':

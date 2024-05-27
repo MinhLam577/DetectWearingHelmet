@@ -3,9 +3,9 @@ import cv2
 import os
 import re
 
-img_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_2\helm\helm\images\valid"
-annotation_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_2\helm\helm\labels\valid"
-save_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_2\helm\helm\labels\valid_voc"
+img_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Nhan_final\daloc"
+annotation_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Nhan_final\daloc_label"
+save_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Nhan_final\daloc_voc"
 label_path = r'D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\annotations\label_map.pbtxt'
 
 # Read image
