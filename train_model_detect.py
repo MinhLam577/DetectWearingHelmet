@@ -120,4 +120,10 @@ configs['eval_input_configs'][0].tf_record_input_reader.input_path[:] = [os.path
 pipeline_config = config_util.create_pipeline_proto_from_configs(configs)
 config_util.save_pipeline_config(pipeline_config, os.path.dirname(files['PIPELINE_CONFIG']))
 
+save_dir = paths['CHECKPOINT_PATH']
 
+#Train model
+TRAINING_SCRIPT = os.path.join(paths['APIMODEL_PATH'], 'research', 'object_detection', 'model_main_tf2.py')
+command = "python {} --model_dir={} --pipeline_config_path={} --num_train_steps={} --alsologtostderr".format(TRAINING_SCRIPT, save_dir, files['PIPELINE_CONFIG'], num_steps)
+
+os.system(command)
