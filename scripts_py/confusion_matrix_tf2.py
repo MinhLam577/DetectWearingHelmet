@@ -292,7 +292,7 @@ def draw(image_name, image_path, image, categories, groundtruth_boxes, groundtru
             min_score_thresh=CONFIDENCE_THRESHOLD,
             agnostic_mode=False,
             line_thickness=1)
-
+    image_viz = cv2.cvtColor(image_viz, cv2.COLOR_RGB2BGR)
     cv2.imwrite(os.path.join(image_path, image_name), image_viz)
 
 def plot_confusion_matrix(cm, classes, cmap=plt.cm.Blues):

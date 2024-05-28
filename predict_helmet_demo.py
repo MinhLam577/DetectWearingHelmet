@@ -89,9 +89,9 @@ def draw_ground_truth(img_path, boxes, classes):
             cv2.rectangle(img, (ground_truth_boxes[i][0], ground_truth_boxes[i][1]), (ground_truth_boxes[i][2], ground_truth_boxes[i][3]), (0, 0, 255), 2)
     return img
 
-img_path = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\c94334a3-3b67-45ca-b4f8-4b6249f45009.jpg"
-img = predict_helmet(img_path)
-cv2.imshow('image_np_with_detections', cv2.resize(img, (800, 600)))
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# img_path = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\c94334a3-3b67-45ca-b4f8-4b6249f45009.jpg"
+# img = predict_helmet(img_path)
+# cv2.imshow('image_np_with_detections', cv2.resize(img, (800, 600)))
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
     
