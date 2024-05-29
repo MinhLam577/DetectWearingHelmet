@@ -4,11 +4,15 @@
     <title>Upload Image</title>
     <style>
         *{
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
+        body{
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
         .KhungTongThe{
+            margin-top: 50px;
             display: flex;
             justify-content: center;
             flex-direction: column;
@@ -16,10 +20,10 @@
             padding: 50px;
         }
         .KhungTongThe h1{
-            flex: 0 0 10%;
+            
         }
         .Khung-Output{
-            margin-top: 30px;
+            margin-top: 20px;
             flex: 0 0 80%;
             display: flex;
             justify-content: space-around;
@@ -28,6 +32,7 @@
         }
         .form-output{
             width: 40%;
+            height: 450px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -50,7 +55,7 @@
         }
         #uploaded_image, #result_image {
             width: 100%;
-            height: 300px;
+            min-height: 100%;
             border: 1px solid black;
             margin-top: 20px;
         }
@@ -61,7 +66,7 @@
 <body>
     
     <div class='KhungTongThe'>
-        <h1 style='text-align:center;'>Upload Image Person Wearing Helmet for Detection</h1>
+        <h1 style='text-align:center;'>Detect Person Wearing Helmet</h1>
         <div class='Khung-Output'>
             <div class = 'form-output'>
                 <h2> Ảnh ban đầu </h2>
