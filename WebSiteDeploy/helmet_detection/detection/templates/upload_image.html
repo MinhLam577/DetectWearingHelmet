@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Image</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .KhungTongThe{
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+        }
+        .KhungTongThe h1{
+            flex: 0 0 10%;
+        }
+        .Khung-Output{
+            margin-top: 30px;
+            flex: 0 0 80%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+        }
+        .form-output{
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .form-input{
+            flex: 0 0 10%;
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+            align-items: center;
+            margin-top: 20px;
+            padding: 20px;
+            width: 100%;
+        }
+        .form-input input{
+            padding: 10px;
+            margin-right: 10px;
+            width: 70%;
+        }
+        #uploaded_image, #result_image {
+            width: 100%;
+            height: 300px;
+            border: 1px solid black;
+            margin-top: 20px;
+        }
+
+    </style>
+
+</head>
+<body>
+    
+    <div class='KhungTongThe'>
+        <h1 style='text-align:center;'>Upload Image Person Wearing Helmet for Detection</h1>
+        <div class='Khung-Output'>
+            <div class = 'form-output'>
+                <h2> Ảnh ban đầu </h2>
+                <img src="" id="uploaded_image">
+            </div>
+            <div class = 'form-output'>
+                <h2> Ảnh dự đoán </h2>
+                <img src="" id="result_image">
+            </div>
+        </div>
+        <div class='Khung-Input'>
+            <form method="post" enctype="multipart/form-data" class ='form-input'>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" style="
+                cursor: pointer; padding:5px; border-radius:10px; border:None; width: 100px;">Upload</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const uploadedImage = document.getElementById('uploaded_image');
+        const resultImage = document.getElementById('result_image');
+        const form = document.querySelector('form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch('', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();  // Lấy đối tượng JSON từ phản hồi
+            uploadedImage.src = 'data:image/png;base64,' + data.uploaded_image;  // Cập nhật src của ảnh đã tải lên
+            resultImage.src = 'data:image/png;base64,' + data.processed_image;  // Cập nhật src của ảnh kết quả
+        });
+    </script>
+</body>
+</html>
