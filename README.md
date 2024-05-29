@@ -7,18 +7,18 @@ This model not only detects individuals in images but also determines whether th
 
 We have also developed a web page using Django, allowing users to upload images and process them with our model. The end result is a comprehensive system, from the server-side to the user interface, that effectively monitors and ensures occupational safety.
 # Install and Set up all dependencies
-### Create and activate environment variables
+#### Create and activate environment variables
 ```
 python -m venv myvenv
 .\myvenv\Scripts\activate
 ```
-### Install jupyter notebook, ipykernel, add environment to jupyter notebook and open jupyter notebook in terminal
+#### Install jupyter notebook, ipykernel, add environment to jupyter notebook and open jupyter notebook in terminal
 ```
 pip install jupyter ipykernel
 python -m ipykernel install --user --name=myvenv
 jupyter notebook
 ```
-### Open Setup.ipynb and click change kernel
+#### Open Setup.ipynb and click change kernel
 ![examples](setup_images/changekernel.png)
-### Change kernel to myvenv and run all cells
+#### Change kernel to myvenv and run all cells
 ![examples](setup_images/selectenvir.png)
