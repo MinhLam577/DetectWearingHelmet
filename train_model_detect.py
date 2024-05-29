@@ -96,26 +96,6 @@ configs['train_input_config'].tf_record_input_reader.input_path[:] = [os.path.jo
 configs['eval_input_configs'][0].label_map_path = files['LABELMAP']
 configs['eval_input_configs'][0].tf_record_input_reader.input_path[:] = [os.path.join(paths['ANNOTATION_PATH'], 'valid.record')]
 
-# # Custom lại model faster rcnn
-# configs['model'].faster_rcnn.num_classes = len(labels)
-# configs['model'].faster_rcnn.second_stage_post_processing.batch_non_max_suppression.max_detections_per_class = 100
-# configs['model'].faster_rcnn.second_stage_post_processing.batch_non_max_suppression.max_total_detections = 100
-# configs['model'].faster_rcnn.image_resizer.fixed_shape_resizer.height = 320
-# configs['model'].faster_rcnn.image_resizer.fixed_shape_resizer.width = 320
-# configs['train_config'].batch_size = 4
-# configs['train_config'].fine_tune_checkpoint = os.path.join(paths['PRETRAINED_MODEL_PATH'], PRETRAINED_MODEL_NAME, 'checkpoint', 'ckpt-0')
-# configs['train_config'].fine_tune_checkpoint_type = "detection"
-# configs['train_config'].num_steps = num_steps
-# configs['train_config'].optimizer.momentum_optimizer.learning_rate.cosine_decay_learning_rate.total_steps = num_steps
-# configs['train_config'].optimizer.momentum_optimizer.learning_rate.cosine_decay_learning_rate.warmup_learning_rate = warmup_learning_rate
-# configs['train_config'].optimizer.momentum_optimizer.learning_rate.cosine_decay_learning_rate.learning_rate_base = learning_rate_base
-# configs['train_config'].optimizer.momentum_optimizer.learning_rate.cosine_decay_learning_rate.warmup_steps = warm_step
-# configs['train_config'].max_number_of_boxes = 100
-# configs['train_input_config'].label_map_path = files['LABELMAP']
-# configs['train_input_config'].tf_record_input_reader.input_path[:] = [os.path.join(paths['ANNOTATION_PATH'], 'train.record')]
-# configs['eval_input_configs'][0].label_map_path = files['LABELMAP']
-# configs['eval_input_configs'][0].tf_record_input_reader.input_path[:] = [os.path.join(paths['ANNOTATION_PATH'], 'valid.record')]
-
 # Lưu lại custom model vào file config
 pipeline_config = config_util.create_pipeline_proto_from_configs(configs)
 config_util.save_pipeline_config(pipeline_config, os.path.dirname(files['PIPELINE_CONFIG']))
@@ -123,7 +103,7 @@ config_util.save_pipeline_config(pipeline_config, os.path.dirname(files['PIPELIN
 save_dir = paths['CHECKPOINT_PATH']
 
 #Train model
-TRAINING_SCRIPT = os.path.join(paths['APIMODEL_PATH'], 'research', 'object_detection', 'model_main_tf2.py')
+TRAINING_SCRIPT = r'scripts_py'
 command = "python {} --model_dir={} --pipeline_config_path={} --num_train_steps={} --alsologtostderr".format(TRAINING_SCRIPT, save_dir, files['PIPELINE_CONFIG'], num_steps)
 
 os.system(command)

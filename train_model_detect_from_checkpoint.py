@@ -103,7 +103,7 @@ config_util.save_pipeline_config(pipeline_config, os.path.dirname(files['PIPELIN
 save_dir = paths['CHECKPOINT_PATH']
 
 #Train model
-TRAINING_SCRIPT = os.path.join(paths['APIMODEL_PATH'], 'research', 'object_detection', 'model_main_tf2.py')
+TRAINING_SCRIPT = r'scripts_py'
 command = "python {} --model_dir={} --pipeline_config_path={} --num_train_steps={} --alsologtostderr".format(TRAINING_SCRIPT, save_dir, files['PIPELINE_CONFIG'], num_steps)
 
 os.system(command)

@@ -1,4 +1,3 @@
-import itertools
 import os
 from PIL import Image
 import io
@@ -7,12 +6,6 @@ import tensorflow as tf
 import numpy as np
 import pandas as pd
 import time, progressbar
-from object_detection.inference import detection_inference
-from object_detection.utils.dataset_util import bytes_list_feature
-from object_detection.utils.dataset_util import float_list_feature
-from object_detection.utils.dataset_util import int64_list_feature
-from object_detection.utils.dataset_util import int64_feature
-from object_detection.utils.dataset_util import bytes_feature
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as viz_utils
 from object_detection.core import data_parser
@@ -20,6 +13,7 @@ from object_detection.core import standard_fields as fields
 import matplotlib.pyplot as plt
 from object_detection.metrics.tf_example_parser import BoundingBoxParser, StringParser, Int64Parser, FloatParser
 import seaborn as sns
+
 tf.compat.v1.flags.DEFINE_string('input_tfrecord_path', None,
                                  'Input tf record path')
 tf.compat.v1.flags.DEFINE_string('output_path', None,
@@ -38,7 +32,6 @@ IOU_THRESHOLD = 0.5
 CONFIDENCE_THRESHOLD = 0.5
 
 class CustomParser(data_parser.DataToNumpyParser):
-  """Tensorflow Example proto parser."""
 
   def __init__(self):
     self.items_to_handlers = {
@@ -56,17 +49,6 @@ class CustomParser(data_parser.DataToNumpyParser):
     self.filename = StringParser(fields.TfExampleFields.filename)
 
   def parse(self, tf_example):
-    """
-    Parses tensorflow example and returns a tensor dictionary.
-    Args:
-        tf_example: a tf.Example object.
-    Returns:
-        A dictionary of the following numpy arrays:
-        image               - string containing input image.
-        filename            - string containing input filename (optional, None if not specified)
-        groundtruth_boxes   - a numpy array containing groundtruth boxes.
-        groundtruth_classes - a numpy array containing groundtruth classes.
-    """
     results_dict = {}
     parsed = True
     for key, parser in self.items_to_handlers.items():
@@ -95,17 +77,7 @@ def compute_iou(groundtruth_box, detection_box):
 
     return intersection / float(boxAArea + boxBArea - intersection)
 
-# def process_detections(input_dataset, model, categories, draw_option, draw_save_path):
 def process_detections(input_tfrecord_path, model, categories, draw_option, draw_save_path):
-    """
-    Creates input dataset from tfrecord, runs detection model, compares detection results with ground truth
-    Args:
-        input_tfrecord_path: path of input tfrecord file
-        model: path of detection model .pb file
-        categories: ordered array of class IDs
-        draw_option: whether or not to visualize and save detections and ground truth boxes
-        draw_save_path: where to save visualizations if draw_option is true
-    """
     data_parser = CustomParser()
     confusion_matrix = np.zeros(shape=(len(categories) + 1, len(categories) + 1))
     
@@ -180,13 +152,6 @@ def process_detections(input_tfrecord_path, model, categories, draw_option, draw
     return confusion_matrix
     
 def display(confusion_matrix, categories, output_path):
-    '''
-    Displays confusion matrix as pandas df to terminal and saves as CSV
-    Args:
-      confusion_matrix: matrix to be displayed
-      categories: ordered array of class IDs
-      output_path: where to save CSV
-    '''
     results = []
 
     for i in range(len(categories)):
@@ -237,36 +202,10 @@ def display(confusion_matrix, categories, output_path):
     df.to_csv(output_path)
 
 def draw(image_name, image_path, image, categories, groundtruth_boxes, groundtruth_classes, detection_boxes, detection_classes, detection_scores):
-    '''
-    Draws ground truth and detection boxes and labels onto image, saves image
-    Args:
-      image_name: what to save the image as
-      image_path: where to save the image
-      image: image as np array
-      categories: ordered array of class IDs for detections
-      groundtruth_boxes: coordinates of ground truth boxes
-      groundtruth_classes: class IDs corresponding to "categories"
-      detection_boxes: coordinates of detection boxes from model
-      detection_classes: class IDs correpsonding to "categories"
-      detection_scores: scores for each detection box
-    '''
     # Convert category array to category index
     cat_index = {}
     for i, item in enumerate(categories):
         cat_index[i+1] = item
-
-    # Draw ground truth
-    '''
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    NOTE: as of 11.17.2020, viz_util's ground truth
-    option won't print the class name with the box.
-    To see the class name for ground truth boxes, add
-
-    class_name = category_index[classes[i]]['name']
-    box_to_display_str_map[box].append(class_name)
-
-    under "if scores is None:" (line 1182)
-    '''
     image_viz = image.copy()
     viz_utils.visualize_boxes_and_labels_on_image_array(
             image_viz,
