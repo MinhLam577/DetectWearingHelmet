@@ -3,11 +3,6 @@ import cv2
 import os
 import re
 
-img_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Nhan_final\daloc"
-annotation_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Nhan_final\daloc_label"
-save_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Nhan_final\daloc_voc"
-label_path = r'D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\annotations\label_map.pbtxt'
-
 # Read image
 def ReadImage(filename):
     img = cv2.imread(filename)
@@ -31,7 +26,7 @@ def ReadAnnotation(filename):
             annotation.append(data)
     return annotation
 
-def convert_yolo_to_xml(yolo_data_path, img_path, label_path):
+def convert_yolo_to_xml(yolo_data_path, img_path, label_path, save_dir):
     label_data = ReadLabel(label_path)
     yolo_data_arr = ReadAnnotation(yolo_data_path)
     img = ReadImage(img_path)
@@ -76,15 +71,3 @@ def convert_yolo_to_xml(yolo_data_path, img_path, label_path):
     save_path = os.path.join(save_dir, img_name.split('.')[0] + ".xml")
     with open(save_path, "wb") as f:
         f.write(xml_str)
-
-list_img = os.listdir(img_dir)
-list_annotation = os.listdir(annotation_dir)
-
-list_img = [os.path.join(img_dir, i) for i in list_img]
-list_annotation = [os.path.join(annotation_dir, i) for i in list_annotation]
-
-#rename the annotation file to 1.txt, 2.txt, 3.txt, ... and the image file to 1.jpg, 2.jpg, 3.jpg
-for idx, (img_path, annotation_path) in enumerate(zip(list_img, list_annotation), 1):
-    percentage = idx / len(list_img) * 100
-    print(f"Processing: {idx}/{len(list_img)} - {percentage:.2f}%")
-    convert_yolo_to_xml(annotation_path, img_path, label_path)
