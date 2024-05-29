@@ -1,0 +1,10 @@
+tensorflow==2.15.0
+absl-py
+protobuf==3.20.*
+cycler
+kiwisolver
+pytz
+PyYaml
+gin-config==0.1.1
+python-dateutil
+opencv-python
