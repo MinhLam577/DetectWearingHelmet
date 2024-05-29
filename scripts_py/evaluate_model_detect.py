@@ -26,7 +26,7 @@ files = {
     'LABELMAP': os.path.join(paths['ANNOTATION_PATH'], LABEL_MAP_NAME)
 }
 
-TRAINING_SCRIPT = os.path.join(paths['APIMODEL_PATH'], 'research', 'object_detection', 'model_main_tf2.py')
+TRAINING_SCRIPT = TRAINING_SCRIPT = os.path.join(MAIN_FOLDER_PATH, r'scripts_py\model_main_tf2.py')
 
 checkpoint_path = paths["CHECKPOINT_PATH"]
 savepoint_path = paths["CHECKPOINT_PATH"]

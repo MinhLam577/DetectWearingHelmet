@@ -30,11 +30,6 @@ files = {
     'LABELMAP': os.path.join(paths['ANNOTATION_PATH'], LABEL_MAP_NAME)
 }
 
-# Create Directory Structure
-for path in paths.values():
-    if not os.path.exists(path):
-        os.makedirs(path)
-
 # Create Label Map
 labels = [
     {'name':'head', 'id':1},
@@ -47,27 +42,27 @@ with open(files['LABELMAP'], 'w') as f:
         f.write('\tid:{}\n'.format(label['id']))
         f.write('}\n')
         
-# img_train_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_1_Test\train"
-# img_valid_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_1_Test\valid"
-# img_test_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_1_Test\test"
+img_train_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_1_Test\train"
+img_valid_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_1_Test\valid"
+img_test_dir = r"D:\Code_school_nam3ki2\KhoaHocDuLieu\NhanDienMuBaoHiem\Tensorflow\workspace\images\Dataset_1_Test\test"
 
 
-# # Create TF recordsk
-# if not os.path.exists(files['TF_RECORD_SCRIPT']):
-#     os.system(f"git clone https://github.com/nicknochnack/GenerateTFRecord {paths['SCRIPTS_PATH']}")
-# os.system(f"python {files['TF_RECORD_SCRIPT']} -x {img_train_dir} -l {files['LABELMAP']} -o {os.path.join(paths['ANNOTATION_PATH'], 'train.record')}")
-# os.system(f"python {files['TF_RECORD_SCRIPT']} -x {img_valid_dir} -l {files['LABELMAP']} -o {os.path.join(paths['ANNOTATION_PATH'], 'valid.record')}")
-# os.system(f"python {files['TF_RECORD_SCRIPT']} -x {img_test_dir} -l {files['LABELMAP']} -o {os.path.join(paths['ANNOTATION_PATH'], 'test.record')}")
+# Create TF recordsk
+if not os.path.exists(files['TF_RECORD_SCRIPT']):
+    os.system(f"git clone https://github.com/nicknochnack/GenerateTFRecord {paths['SCRIPTS_PATH']}")
+os.system(f"python {files['TF_RECORD_SCRIPT']} -x {img_train_dir} -l {files['LABELMAP']} -o {os.path.join(paths['ANNOTATION_PATH'], 'train.record')}")
+os.system(f"python {files['TF_RECORD_SCRIPT']} -x {img_valid_dir} -l {files['LABELMAP']} -o {os.path.join(paths['ANNOTATION_PATH'], 'valid.record')}")
+os.system(f"python {files['TF_RECORD_SCRIPT']} -x {img_test_dir} -l {files['LABELMAP']} -o {os.path.join(paths['ANNOTATION_PATH'], 'test.record')}")
 
 num_steps = 100000
 warm_step = 4000
 learning_rate_base = 0.15
 warmup_learning_rate = 0.05
-total_steps = num_steps + warm_step
+total_steps = num_steps
 
-# #Copy model config từ file config của pretrain_model
-# command_copy_model_config = f"copy {os.path.join(paths['PRETRAINED_MODEL_PATH'], PRETRAINED_MODEL_NAME, 'pipeline.config')} {os.path.join(paths['CHECKPOINT_PATH'])}"
-# os.system(command_copy_model_config)
+#Copy model config từ file config của pretrain_model
+command_copy_model_config = f"copy {os.path.join(paths['PRETRAINED_MODEL_PATH'], PRETRAINED_MODEL_NAME, 'pipeline.config')} {os.path.join(paths['CHECKPOINT_PATH'])}"
+os.system(command_copy_model_config)
 
 # Đọc tệp pipeline.config và lấy ra tất cả các cấu hình.
 configs = config_util.get_configs_from_pipeline_file(files['PIPELINE_CONFIG'])
@@ -97,9 +92,7 @@ pipeline_config = config_util.create_pipeline_proto_from_configs(configs)
 config_util.save_pipeline_config(pipeline_config, os.path.dirname(files['PIPELINE_CONFIG']))
 
 save_dir = paths['CHECKPOINT_PATH']
-
 #Train model
-TRAINING_SCRIPT = r'scripts_py'
+TRAINING_SCRIPT = os.path.join(MAIN_FOLDER_PATH, r'scripts_py\model_main_tf2.py')
 command = "python {} --model_dir={} --pipeline_config_path={} --num_train_steps={} --alsologtostderr".format(TRAINING_SCRIPT, save_dir, files['PIPELINE_CONFIG'], num_steps)
-
 os.system(command)
