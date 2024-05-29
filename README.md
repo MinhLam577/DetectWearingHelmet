@@ -20,5 +20,5 @@ jupyter notebook
 ```
 ### Open Setup.ipynb and click change kernel
 ![examples](setup_images/changekernel.png)
-Change kernel to myvenv and run all cells
+### Change kernel to myvenv and run all cells
 ![examples](setup_images/selectenvir.png)
