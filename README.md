@@ -38,6 +38,10 @@ python .\scripts_py\train_model_detect_from_checkpoint.py
 You can change all config you want in both train_model_detect.py and train_model_detect_from_checkpoint.py
 ### In jupyter notebook
 Run scripts_ipynb\CustomAndTrainModel.ipynb
+
+### Train results
+![examples](setup_images/train-loss_eval-loss.png)
+![examples](setup_images/Precision_Recall_F1_score.png)
 ## Evaluate model
 #### In vscode terminal
 ```
@@ -45,6 +49,9 @@ python scripts_py\evaluate_model_detect.py
 ```
 #### In jupyter notebook
 Run scripts_ipynb\EvaluateModel.ipynb
+#### Evaluate Results
+![examples](setup_images/confusion_matrix.png)
+![examples](setup_images/Precision_Recall_f1_score_Accuracy.png)
 ## Save model
 #### In vscode terminal
 ```
@@ -83,3 +90,4 @@ Example: if your IPV4 address is 192.168.1.50, your URL to server is 192.168.1.5
 Click the choose file to browse your image and then upload it, when upload wait for seconds and see the results
 ### Detect result
 ![examples](setup_images/detect_result.png)
+![examples](setup_images/confusion_matrix.png)
