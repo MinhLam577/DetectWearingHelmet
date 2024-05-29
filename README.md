@@ -19,6 +19,6 @@ python -m ipykernel install --user --name=myvenv
 jupyter notebook
 ```
 - Open Setup.ipynb and click change kernel
-![examples](setup_images\changekernel.png)
+![examples](setup_images/changekernel.png)
 - Change kernel to myvenv and run all cells
-![examples](setup_images\selectenvir.png)
+![examples](setup_images/selectenvir.png)
